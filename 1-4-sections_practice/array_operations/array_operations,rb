@@ -1,0 +1,7 @@
+num=[1,2,3,4,5,6]
+puts num
+num<<7
+puts num
+puts [1]
+num[0]=8
+puts num.inspect
