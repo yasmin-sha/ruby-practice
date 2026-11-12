@@ -24,7 +24,7 @@ end
     
     if mark.between?(0,100)
       @scores<<mark
-      puts "scores added  #{@scores}"
+      puts "scores added:  #{@scores}"
     else
       puts "enter a score between 0 & 100"
     end
@@ -100,7 +100,7 @@ class GradebookApp
                 print "\n enter student name:"
                 $stdout.flush
                 name =gets.strip.chomp.capitalize
-                print "enter mark(0-100)"
+                print "enter mark(0-100): "
                 $stdout.flush
                 mark=gets.strip.chomp.to_i
                 if @students.key?(name)
