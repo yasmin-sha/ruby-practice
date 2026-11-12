@@ -10,10 +10,10 @@ module Formatter
     end
 end
 
-# -------------------------------------------------------------------
+    # -------------------------------------------------------------------
 # CLASSES: Student Class
 # -------------------------------------------------------------------
-    
+
       class Student
         attr_accessor :name, :scores
   def initialize(name,scores=[])
@@ -93,7 +93,7 @@ class GradebookApp
                     puts "all student"
                     @students.each do|name,student|
                         puts student
-                    end1
+                    end
                     puts "-----------------------\n"
                 end
             when 2
@@ -130,7 +130,6 @@ class GradebookApp
         end
     end
 end
-    # Executing the Application
 app=GradebookApp.new
 app.run
 
