@@ -88,7 +88,7 @@ class GradebookApp
             case choice
             when 1
                 if @students.empty?
-                    puts"nostudent found"
+                    puts"No student found"
                 else
                     puts "all student"
                     @students.each do|name,student|
