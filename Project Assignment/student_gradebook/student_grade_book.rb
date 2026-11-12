@@ -1,6 +1,7 @@
 # -------------------------------------------------------------------
 # MODULES: Formatter Module
 # -------------------------------------------------------------------
+
 module Formatter
     def self.format_title(title)
       cleaned=title.to_s.strip.gsub(/\s+/ ,' ').upcase
@@ -9,14 +10,14 @@ module Formatter
     end
 end
 
-    # -------------------------------------------------------------------
+# -------------------------------------------------------------------
 # CLASSES: Student Class
 # -------------------------------------------------------------------
-
+    
       class Student
         attr_accessor :name, :scores
-  def initialize(names,scores=[])
-    @names=names
+  def initialize(name,scores=[])
+    @name=name.strip.capitalize
     @scores=scores
   end
   def add_score(mark)
@@ -34,12 +35,11 @@ end
   end
 
 def to_s
-    "student: #{@names} | scores:#{@scores}| average:#{average_score}"
+    "student: #{@name} | scores:#{@scores}| average:#{average_score}"
 end
 end
   
-  32
-  # -------------------------------------------------------------------
+ # -------------------------------------------------------------------
 # MAIN APPLICATION: GradebookApp
 # -------------------------------------------------------------------
 
@@ -66,8 +66,10 @@ class GradebookApp
     def load_data
         if File.exist?(FILE_PATH)
             File.readlines(FILE_PATH).each do|line|
-
-                  @students[name]=Student.new(name,scores)
+                parts=line.split(",")
+                name=parts[0]
+                scores=parts[1..].map(&:to_i)
+                @students[name]=Student.new(name,scores)
             end
         end
     end
@@ -91,13 +93,15 @@ class GradebookApp
                     puts "all student"
                     @students.each do|name,student|
                         puts student
-                    end
+                    end1
                     puts "-----------------------\n"
                 end
             when 2
                 print "\n enter student name:"
-                name =gets.strip.chomp
+                $stdout.flush
+                name =gets.strip.chomp.capitalize
                 print "enter mark(0-100)"
+                $stdout.flush
                 mark=gets.strip.chomp.to_i
                 if @students.key?(name)
                     @students[name].add_score(mark)
@@ -121,12 +125,12 @@ class GradebookApp
                 puts "Goodbye"
                 break
             else
-                puts "\n enter number between 0-100"
+                puts "\n enter number between 1-4"
             end
         end
     end
 end
-# Executing the Application
+    # Executing the Application
 app=GradebookApp.new
 app.run
 
