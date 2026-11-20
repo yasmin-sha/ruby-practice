@@ -1,4 +1,7 @@
 
+
+
+
 require 'securerandom'
 
 module Formatter
@@ -147,19 +150,9 @@ enemies=["Goblin", "Troll","Dragon"]
 
 
 # --- Start combat ---
-defending = false
-turn = 0
-loop do 
-        turn += 1
-      
-        if turn > 20
-          puts "Maximum turns reached. Battle ended."
-          break
-        end
-    escaped = false
-        break unless player_info.health > 0 && enemy.alive?
 
-
+        
+   
        # print "\nChoose action (attack, defend, run, exit): "
         #choice = gets.chomp.strip.downcase
         choice="attack"
@@ -258,12 +251,15 @@ when "run"
             puts "escape failed; the enemy attacks"
             false
         end
- def start_battle
+    end
+    def start_battle
         loop do
             break unless @enemy.alive? && @player.alive?
+            puts " choose your action"
             puts "attack"
             puts "defend"
             puts "run"
+            print "enter your choice"
             choice =gets.chomp.downcase
         case choice
         when "attack"
@@ -271,20 +267,24 @@ when "run"
         when "defend"
             defend
         when "run"
+            if run
+              puts "you escapedsafely"
             break 
-        else
-            puts "invalid choice"
-            next
+            end
+            break unless @enemy.alive?
+            enemy_attack
+            unless @player.alive?
+                puts "you are defeated"
+                break
+            end
         end
-        break unless @enemy.alive?
-                enemy_attack
+        if !@enemy.alive?
+            puts "congratulation you defeated the enemy"
+        end
     end
-end
 
-
-    end
-   
-
+combat= CombatEngine.new(player_info,enemy)
+combat.start_battle
 
 
 
