@@ -1,0 +1,267 @@
+
+require 'securerandom'
+
+module Formatter
+    def self.format_title(title)
+      cleaned=title.to_s.strip.gsub(/\s+/ ,' ').upcase
+      header="-"*(cleaned.length)
+       "#{header}\n #{cleaned}\n  #{header}"
+    end
+end
+puts Formatter.format_title("RUBY RPG GAME")
+class Player
+    attr_reader :attack, :defence, :health
+        def initialize(name, character_class, health, attack, defence)
+        @name=name
+        @id = SecureRandom.uuid
+        @character_class=character_class
+        @level=1
+        @xp=0
+        @health= health
+        @attack=attack
+        @defence=defence
+     
+    end
+    def alive?
+       @health > 0
+    end
+    def display_info
+        puts "\n\n"
+        puts "PLAYER INFORMATION\n"
+        puts "Name:  #{@name}\n"
+        puts "ID:   #{@id}\n "
+        puts "Character_class:  #{@character_class}\n"
+        puts "Level:  #{@level}\n"
+        puts "XP:  #{@xp}\n"
+        puts "Health:  #{@health}\n" 
+        puts "Attack:  #{@attack}\n"
+        puts "Defence:  #{@defence}"
+    end
+        def take_damage(damage)
+        @health -= damage
+        @health = 0 if @health < 0
+        puts "Remaining Health: #{@health}"
+    end
+    
+end
+
+
+# --- Generate and create Enemy ---
+class Enemy
+    attr_reader :attack, :defence, :health
+    def initialize(name,level,health,attack,defence)
+        @name=name
+        @level=level
+        @health= health
+        @attack=attack
+        @defence=defence
+    end
+    def display_info
+        puts "ENEMY INFORMATION\n"
+        puts "Name:  #{@name}\n"
+        puts "Level:  #{@level}\n"
+        puts "Health:  #{@health}\n" 
+        puts "Attack:  #{@attack}\n"
+        puts "Defence:  #{@defence}"
+    end
+    def alive?
+        @health>0
+    end
+    def take_damage(damage)
+        @health -= damage
+        @health = 0 if @health < 0
+        puts "Remaining Health: #{@health}"
+    end
+end
+# --- Create Player ---
+
+   # player_info.take_damage(50)
+   # player_info.take_damage(200)
+ #             player_info.take_damage(-20)
+   # player_info.heal(50)
+  #  player_info.heal(203)
+    name = "Player"
+    character_class = "Warrior"
+      puts "welcome #{name}"
+      puts "your selected classes: #{character_class}\n"
+    
+     store_health = 0
+    store_attack =0
+    store_defence =0
+case character_class.strip.downcase
+when "warrior"
+    store_health = 150
+    store_attack = 20
+    store_defence = 15
+when "mage"
+    store_health = 100
+    store_attack = 30
+    store_defence = 8
+ when "rogue"
+        store_health = 120
+        store_attack = 25
+        store_defence = 10
+        else
+        puts "Invalid character class"
+        exit
+    end
+   
+   
+    player_info = Player.new(name, character_class, store_health, store_attack, store_defence)
+    player_info.display_info
+   # player_info.take_damage(59)
+
+
+   # --- Generate and create Enemy ------------------
+
+enemies=["Goblin", "Troll","Dragon"]
+        
+
+    enemy_name=enemies.sample
+        store_level = 0
+        store_health = 0
+        store_attack =0
+        store_defence =0
+    case enemy_name.strip
+    when "Goblin"
+        store_level = 1
+        store_health = 40
+        store_attack = 10
+        store_defence = 5
+    when "Troll"
+        store_level = 2
+        store_health = 80
+        store_attack = 20
+        store_defence = 10
+     when "Dragon"
+        store_level = 5
+        store_health = 150
+        store_attack = 35
+        store_defence = 20
+        else
+        puts "Invalid enemy"
+        exit
+     end
+    enemy=Enemy.new(enemy_name,store_level,store_health,store_attack,store_defence)
+        enemy.display_info
+
+
+# --- Start combat ---
+defending = false
+turn = 0
+loop do 
+        turn += 1
+      
+        if turn > 20
+          puts "Maximum turns reached. Battle ended."
+          break
+        end
+    escaped = false
+        break unless player_info.health > 0 && enemy.alive?
+
+
+       # print "\nChoose action (attack, defend, run, exit): "
+        #choice = gets.chomp.strip.downcase
+        choice="attack"
+break if choice == "exit"
+case choice
+when"attack"
+        raw = player_info.attack - enemy.defence
+
+    damage = raw < 0 ? 0 : raw
+    puts "you attacked the enemy for: #{damage}"
+    
+    #puts "you attacked the enemy"
+    enemy.take_damage(damage)
+
+when "defend"
+    defending = true
+    puts "you prepared to defend"
+when "run"
+    roll = rand(1..2)
+    if roll ==1
+        escaped = true
+        puts "you escaped"
+    else
+        puts "escaped failed.the enemy attack you"
+    end
+    else
+        puts "invalid action"
+        next
+    end
+
+    break unless enemy.alive?
+
+
+    if escaped
+        puts "Battle ended,you escaped safely"
+        break
+    else
+        raw=enemy.attack- player_info.defence
+        raw = 0  if raw < 0
+        if defending
+                damage = raw / 2
+                defending= false
+                puts " you defended"
+                else
+                    damage = raw
+                    puts " your recieved a normal attack"
+                end
+                    puts "damage recieved: #{damage}"
+                     player_info.take_damage(damage)
+                    end
+              if !enemy.alive?
+                puts "You defeated the #{enemy_name}!"
+            elsif player_info.health <= 0
+                puts "Enemy stands victorious."
+                break
+            end
+        end
+
+        class CombatEngine
+    def initialize(player,enemy)
+        @player=player
+        @enemy=enemy
+        @defending = false
+    end
+    def test_connection
+        puts "player attack: #{@player.attack}"
+        puts "Enemy attack: #{@enemy.attack}"
+    end
+        def player_attack
+        damage = [@player.attack - @enemy.defence, 0].max
+        puts "player deal#{damage} damage"
+        @enemy.take_damage(damage)
+    end
+        def enemy_attack
+        damage = [@enemy.attack - @player.defence, 0].max
+        if @defending
+            damage = damage / 2
+            puts "player defended, reduced damage: #{damage}"
+        else
+            puts "enemy deal #{damage} damage"
+        end
+
+        @defending= false
+        @player.take_damage(damage)
+    end
+        def defend
+        @defending = true
+        puts "player is defending"
+    end
+    def run
+        roll = rand(1..2)
+        if roll == 1
+            puts "you escaped"
+            true
+        else
+            puts "escape failed; the enemy attacks"
+            false
+        end
+    end
+   
+
+
+
+
+
