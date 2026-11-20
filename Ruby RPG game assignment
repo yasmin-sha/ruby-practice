@@ -149,67 +149,7 @@ enemies=["Goblin", "Troll","Dragon"]
         enemy.display_info
 
 
-# --- Start combat ---
-
-        
-   
-       # print "\nChoose action (attack, defend, run, exit): "
-        #choice = gets.chomp.strip.downcase
-        choice="attack"
-break if choice == "exit"
-case choice
-when"attack"
-        raw = player_info.attack - enemy.defence
-
-    damage = raw < 0 ? 0 : raw
-    puts "you attacked the enemy for: #{damage}"
-    
-    #puts "you attacked the enemy"
-    enemy.take_damage(damage)
-
-when "defend"
-    defending = true
-    puts "you prepared to defend"
-when "run"
-    roll = rand(1..2)
-    if roll ==1
-        escaped = true
-        puts "you escaped"
-    else
-        puts "escaped failed.the enemy attack you"
-    end
-    else
-        puts "invalid action"
-        next
-    end
-
-    break unless enemy.alive?
-
-
-    if escaped
-        puts "Battle ended,you escaped safely"
-        break
-    else
-        raw=enemy.attack- player_info.defence
-        raw = 0  if raw < 0
-        if defending
-                damage = raw / 2
-                defending= false
-                puts " you defended"
-                else
-                    damage = raw
-                    puts " your recieved a normal attack"
-                end
-                    puts "damage recieved: #{damage}"
-                     player_info.take_damage(damage)
-                    end
-              if !enemy.alive?
-                puts "You defeated the #{enemy_name}!"
-            elsif player_info.health <= 0
-                puts "Enemy stands victorious."
-                break
-            end
-        end
+# --- Start CombatEngine class ---
 
         class CombatEngine
     def initialize(player,enemy)
@@ -223,7 +163,7 @@ when "run"
     end
         def player_attack
         damage = [@player.attack - @enemy.defence, 0].max
-        puts "player deal#{damage} damage"
+        puts "player deal #{damage} damage"
         @enemy.take_damage(damage)
     end
         def enemy_attack
@@ -255,7 +195,7 @@ when "run"
     def start_battle
         loop do
             break unless @enemy.alive? && @player.alive?
-            puts " choose your action"
+            puts " \nchoose your action"
             puts "attack"
             puts "defend"
             puts "run"
@@ -268,11 +208,18 @@ when "run"
             defend
         when "run"
             if run
-              puts "you escapedsafely"
+                 puts "you escaped safely"
             break 
             end
+        else
+            puts "invalid choice, try again"
+            next
+        end
+
             break unless @enemy.alive?
+
             enemy_attack
+
             unless @player.alive?
                 puts "you are defeated"
                 break
@@ -282,10 +229,10 @@ when "run"
             puts "congratulation you defeated the enemy"
         end
     end
+end
 
 combat= CombatEngine.new(player_info,enemy)
 combat.start_battle
-
 
 
 
