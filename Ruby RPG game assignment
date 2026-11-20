@@ -258,6 +258,30 @@ when "run"
             puts "escape failed; the enemy attacks"
             false
         end
+ def start_battle
+        loop do
+            break unless @enemy.alive? && @player.alive?
+            puts "attack"
+            puts "defend"
+            puts "run"
+            choice =gets.chomp.downcase
+        case choice
+        when "attack"
+            player_attack
+        when "defend"
+            defend
+        when "run"
+            break 
+        else
+            puts "invalid choice"
+            next
+        end
+        break unless @enemy.alive?
+                enemy_attack
+    end
+end
+
+
     end
    
 
