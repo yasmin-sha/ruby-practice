@@ -290,7 +290,7 @@ end
 
   player
 
-rescue SystemCallError, Psych::Exception, ArgumentError => e
+rescue SystemCallError => e
   puts "Could not load game: #{e.message}"
   nil
 end
