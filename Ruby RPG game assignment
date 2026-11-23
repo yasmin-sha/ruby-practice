@@ -1,238 +1,490 @@
-
-
-
+require 'yaml'
 
 require 'securerandom'
 
+# ==========================================
+# FORMATTER MODULE
+# ==========================================
+
 module Formatter
-    def self.format_title(title)
-      cleaned=title.to_s.strip.gsub(/\s+/ ,' ').upcase
-      header="-"*(cleaned.length)
-       "#{header}\n #{cleaned}\n  #{header}"
-    end
+  def self.format_title(title)
+    cleaned = title.to_s.strip.gsub(/\s+/, ' ').upcase
+    header = "-" * cleaned.length
+
+    "#{header}\n #{cleaned}\n  #{header}"
+  end
 end
+
 puts Formatter.format_title("RUBY RPG GAME")
+
+# ==========================================
+# create module
+# ==========================================
+
+module LoggerModule
+
+  def log_event(message)
+    File.open("battle_log.txt", "a") do |file|
+      file.puts "#{Time.now} - #{message}"
+    end
+  end
+
+end
+
+# ==========================================
+# PLAYER CLASS
+# ==========================================
+
+
 class Player
-    attr_reader :attack, :defence, :health
-        def initialize(name, character_class, health, attack, defence)
-        @name=name
-        @id = SecureRandom.uuid
-        @character_class=character_class
-        @level=1
-        @xp=0
-        @health= health
-        @attack=attack
-        @defence=defence
-     
+  attr_reader :name, :id, :character_class, :attack, :defence, :health, :xp, 
+
+  def initialize(name, character_class, health, attack, defence,
+    id: SecureRandom.uuid, level: 1, xp: 0)
+
+@name = name
+@id = id
+@character_class = character_class
+@level = level
+@xp = xp
+@health = health
+@attack = attack
+@defence = defence
+
+end
+
+  def alive?
+    @health > 0
+  end
+
+  def display_info
+    puts "\nPLAYER INFORMATION"
+    puts "Name: #{@name}"
+    puts "ID: #{@id}"
+    puts "Character Class: #{@character_class}"
+    puts "Level: #{@level}"
+    puts "XP: #{@xp}"
+    puts "Health: #{@health}"
+    puts "Attack: #{@attack}"
+    puts "Defence: #{@defence}"
+  end
+
+  def take_damage(damage)
+    @health -= damage
+    @health = 0 if @health < 0
+    puts "Remaining Health: #{@health}"
+  end
+
+  # Add XP to the player
+  def gain_xp(amount)
+    return if amount <= 0
+
+    @xp += amount
+
+    puts "#{@name} earned #{amount} XP"
+    puts "Total XP: #{@xp}"
+
+    while @xp >= (@level * 100)
+      level_up
     end
-    def alive?
-       @health > 0
-    end
-    def display_info
-        puts "\n\n"
-        puts "PLAYER INFORMATION\n"
-        puts "Name:  #{@name}\n"
-        puts "ID:   #{@id}\n "
-        puts "Character_class:  #{@character_class}\n"
-        puts "Level:  #{@level}\n"
-        puts "XP:  #{@xp}\n"
-        puts "Health:  #{@health}\n" 
-        puts "Attack:  #{@attack}\n"
-        puts "Defence:  #{@defence}"
-    end
-        def take_damage(damage)
-        @health -= damage
-        @health = 0 if @health < 0
-        puts "Remaining Health: #{@health}"
-    end
-    
+  end
+
+  # Increase player level
+  def level_up
+    @xp -= (@level * 100)
+    @level += 1
+
+    puts "Level up! You are now Level #{@level}"
+  end
 end
 
 
-# --- Generate and create Enemy ---
+# ==========================================
+# ENEMY CLASS
+# ==========================================
+
 class Enemy
-    attr_reader :attack, :defence, :health
-    def initialize(name,level,health,attack,defence)
-        @name=name
-        @level=level
-        @health= health
-        @attack=attack
-        @defence=defence
-    end
-    def display_info
-        puts "ENEMY INFORMATION\n"
-        puts "Name:  #{@name}\n"
-        puts "Level:  #{@level}\n"
-        puts "Health:  #{@health}\n" 
-        puts "Attack:  #{@attack}\n"
-        puts "Defence:  #{@defence}"
-    end
-    def alive?
-        @health>0
-    end
-    def take_damage(damage)
-        @health -= damage
-        @health = 0 if @health < 0
-        puts "Remaining Health: #{@health}"
-    end
-end
-# --- Create Player ---
+ 
+  attr_reader :name, :attack, :defence, :health, :level
+  
+  def initialize(name, level, health, attack, defence)
+    @name = name
+    @level = level
+    @health = health
+    @attack = attack
+    @defence = defence
+  end
 
-   # player_info.take_damage(50)
-   # player_info.take_damage(200)
- #             player_info.take_damage(-20)
-   # player_info.heal(50)
-  #  player_info.heal(203)
-    name = "Player"
-    character_class = "Warrior"
-      puts "welcome #{name}"
-      puts "your selected classes: #{character_class}\n"
+  def display_info
+    puts "\nENEMY INFORMATION"
+    puts "Name: #{@name}"
+    puts "Level: #{@level}"
+    puts "Health: #{@health}"
+    puts "Attack: #{@attack}"
+    puts "Defence: #{@defence}"
+  end
+
+  def alive?
+    @health > 0
+  end
+
+  def take_damage(damage)
+    @health -= damage
+    @health = 0 if @health < 0
+
+    puts "Remaining Health: #{@health}"
+  end
+end
+
+
+# ==========================================
+# CREATE PLAYER
+# ==========================================
+def create_player
+  puts "\n----create new character---"
+
+  print "enter player name: "
+name =gets.chomp.strip.downcase
+
+if name.empty?
+  puts "name cannot be empty"
+  return nil
+end
+
+puts "\nChoose your character class: "
+puts "1. warrior"
+puts "2. mage"
+puts "3. rogue"
+
+print " enter your choice"
+choice = gets.chomp.strip.downcase
+case choice
+
+when "1"
+  character_class = "warrior"
+  store_health = 150
+  store_attack = 20
+  store_defence = 15
+
+when "2"
+  character_class = "mage"
+  store_health = 100
+  store_attack = 30
+  store_defence = 8
+
+when "3"
+  character_class = "rogue"
+  store_health = 120
+  store_attack = 25
+  store_defence = 10
+
+else
+  puts "Invalid character class"
+  return nil 
+end
+
+player_info = Player.new(
+  name,
+  character_class,
+  store_health,
+  store_attack,
+  store_defence
+)
+puts "\nchrachter created successfully"
+player_info.display_info
+player_info
+end
+
+# ==========================================
+# GENERATE RANDOM ENEMY
+# ==========================================
+
+def create_random_enemy
+
+  enemy_name  = ["Goblin", "Troll", "Dragon"].sample
+
+
+case enemy_name
+when "Goblin"
+  store_level = 1
+  store_health = 40
+  store_attack = 10
+  store_defence = 5
+
+when "Troll"
+  store_level = 2
+  store_health = 80
+  store_attack = 20
+  store_defence = 10
+
+when "Dragon"
+  store_level = 5
+  store_health = 150
+  store_attack = 35
+  store_defence = 20
+end
+
+enemy = Enemy.new(
+ enemy_name,
+ store_level,
+ store_health,
+  store_attack,
+  store_defence
+)
+end
+
+#enemy.display_info
+
+# ==========================================
+# SAVE & LOAD PLAYER (YAML)
+# ==========================================
+
+
+def save_player(player)
+  player_data = {
+    "name" => player.name,
+    "id" => player.id,
+    "character_class" => player.character_class,
+    "level" => player.level,
+    "xp" => player.xp,
+    "health" => player.health,
+    "attack" => player.attack,
+    "defence" => player.defence
+  }
+
+  yaml_data = YAML.dump(player_data)
+
+  File.write("player_data.yml", yaml_data)
+
+  puts "\nGame saved successfully!"
+
+rescue SystemCallError => e
+  puts "Could not save game: #{e.message}"
+end
+
+
+def load_player
+  unless File.exist?("player_data.yml")
+    puts "No saved game found!"
+    return nil
+  end
+
+  loaded_data = YAML.safe_load_file("player_data.yml")
+unless loaded_data.is_a?(Hash)
+  puts "saved gamefile is empty or currupted."
+  return nil
+end
+  player = Player.new(
+    loaded_data["name"],
+    loaded_data["character_class"],
+    loaded_data["health"],
+    loaded_data["attack"],
+    loaded_data["defence"],
+    id: loaded_data["id"],
+    level: loaded_data["level"],
+    xp: loaded_data["xp"]
+  )
+
+  puts "\nGame loaded successfully!"
+  player.display_info
+
+  player
+
+rescue SystemCallError, Psych::Exception, ArgumentError => e
+  puts "Could not load game: #{e.message}"
+  nil
+end
+
+
+def show_menu
+  puts "\n========================"
+  puts "      RUBY RPG GAME"
+  puts "========================"
+  puts "1. New Game"
+  puts "2. Load Game"
+  puts "3. Exit"
+  print "Enter your choice: "
+end
+
+
+
+# ==========================================
+# COMBAT ENGINE CLASS
+# ==========================================
+
+class CombatEngine
+    include LoggerModule
+
+  def initialize(player, enemy)
+    @player = player
+    @enemy = enemy
+    @defending = false
+  end
+
+  def test_connection
+    puts "Player attack: #{@player.attack}"
+    puts "Enemy attack: #{@enemy.attack}"
+  end
+
+  # Player attacks enemy
+  def player_attack
+    log_event("Player attacked the enemy")
+
+    damage = [@player.attack - @enemy.defence, 0].max
+
+    puts "Player deals #{damage} damage"
+
+    @enemy.take_damage(damage)
+  end
+
+  # Enemy attacks player
+  def enemy_attack
+    log_event("Enemy attacked the player")
+    damage = [@enemy.attack - @player.defence, 0].max
+
+    if @defending
+      damage /= 2
+      puts "Player defended, reduced damage: #{damage}"
+    else
+      puts "Enemy deals #{damage} damage"
+    end
+
+    @defending = false
+
+    @player.take_damage(damage)
+  end
+
+  # Player defends
+  def defend
+
+    log_event("Player defended")
+
+    @defending = true
+    puts "Player is defending"
+  end
+
+  # Player tries to escape
+  def run
+
+  log_event("Player tried to escape")
+
+    roll = rand(1..2)
+
+    if roll == 1
+      puts "You escaped"
+      true
+    else
+      puts "Escape failed; the enemy attacks"
+      false
+    end
+  end
+
+  # Main battle loop
+  def start_battle
+
+    log_event("Battle started")
+
+    loop do
+      break unless @enemy.alive? && @player.alive?
+
+      puts "\n choose your action"
+      puts "1. attack"
+      puts "2. defend"
+      puts "3. run"
+
+      print "enter your choice: "
+      choice=gets.chomp.strip.downcase
+
+      case choice
+
+      when "1"
+        player_attack
+      when "2"
+        defend
+
+      when "3"
+        if run
+          
+          break
+        end
+
+      else
+        puts "Invalid choice, try again"
+        next
+      end
+
+      break unless @enemy.alive?
+
+      enemy_attack
+
+      unless @player.alive?
+        log_event("Player was defeated")
+        puts "You are defeated"
+        break
+      end
+    end
+
+    # Give XP only when enemy is defeated
+    unless @enemy.alive?
+      reward = @enemy.level * 20
+
+      puts "Congratulations! You defeated the enemy"
+
+      @player.gain_xp(reward)
+    end
+  end
+end
+
+
+# ==========================================
+# START GAME
+# ==========================================
+
+
+loop do
+  show_menu
+  choice=gets.chomp.strip
+  case choice
+when "1"
+
+  #create a new player
+  player_info=create_player
+  
+  if player_info
+    enemy=create_random_enemy
+
+    puts "\n a valid #{enemy.name} appeared"
+
+    combat = CombatEngine.new(player_info, enemy)
+    combat.start_battle
+
+    #save player latest progress
+    save_player(player_info)
+  end
+
+when "2"
+
+  #load an existing player
+  player_info= load_player
+
+  if player_info
+    enemy=create_random_enemy
+    puts "\n a valid #{enemy.name} appeared"
     
-     store_health = 0
-    store_attack =0
-    store_defence =0
-case character_class.strip.downcase
-when "warrior"
-    store_health = 150
-    store_attack = 20
-    store_defence = 15
-when "mage"
-    store_health = 100
-    store_attack = 30
-    store_defence = 8
- when "rogue"
-        store_health = 120
-        store_attack = 25
-        store_defence = 10
-        else
-        puts "Invalid character class"
-        exit
-    end
-   
-   
-    player_info = Player.new(name, character_class, store_health, store_attack, store_defence)
-    player_info.display_info
-   # player_info.take_damage(59)
-
-
-   # --- Generate and create Enemy ------------------
-
-enemies=["Goblin", "Troll","Dragon"]
-        
-
-    enemy_name=enemies.sample
-        store_level = 0
-        store_health = 0
-        store_attack =0
-        store_defence =0
-    case enemy_name.strip
-    when "Goblin"
-        store_level = 1
-        store_health = 40
-        store_attack = 10
-        store_defence = 5
-    when "Troll"
-        store_level = 2
-        store_health = 80
-        store_attack = 20
-        store_defence = 10
-     when "Dragon"
-        store_level = 5
-        store_health = 150
-        store_attack = 35
-        store_defence = 20
-        else
-        puts "Invalid enemy"
-        exit
-     end
-    enemy=Enemy.new(enemy_name,store_level,store_health,store_attack,store_defence)
-        enemy.display_info
-
-
-# --- Start CombatEngine class ---
-
-        class CombatEngine
-    def initialize(player,enemy)
-        @player=player
-        @enemy=enemy
-        @defending = false
-    end
-    def test_connection
-        puts "player attack: #{@player.attack}"
-        puts "Enemy attack: #{@enemy.attack}"
-    end
-        def player_attack
-        damage = [@player.attack - @enemy.defence, 0].max
-        puts "player deal #{damage} damage"
-        @enemy.take_damage(damage)
-    end
-        def enemy_attack
-        damage = [@enemy.attack - @player.defence, 0].max
-        if @defending
-            damage = damage / 2
-            puts "player defended, reduced damage: #{damage}"
-        else
-            puts "enemy deal #{damage} damage"
-        end
-
-        @defending= false
-        @player.take_damage(damage)
-    end
-        def defend
-        @defending = true
-        puts "player is defending"
-    end
-    def run
-        roll = rand(1..2)
-        if roll == 1
-            puts "you escaped"
-            true
-        else
-            puts "escape failed; the enemy attacks"
-            false
-        end
-    end
-    def start_battle
-        loop do
-            break unless @enemy.alive? && @player.alive?
-            puts " \nchoose your action"
-            puts "attack"
-            puts "defend"
-            puts "run"
-            print "enter your choice"
-            choice =gets.chomp.downcase
-        case choice
-        when "attack"
-            player_attack
-        when "defend"
-            defend
-        when "run"
-            if run
-                 puts "you escaped safely"
-            break 
-            end
-        else
-            puts "invalid choice, try again"
-            next
-        end
-
-            break unless @enemy.alive?
-
-            enemy_attack
-
-            unless @player.alive?
-                puts "you are defeated"
-                break
-            end
-        end
-        if !@enemy.alive?
-            puts "congratulation you defeated the enemy"
-        end
-    end
-end
-
-combat= CombatEngine.new(player_info,enemy)
+    combat = CombatEngine.new(player_info, enemy)
 combat.start_battle
+
+    #save player updated progress
+    save_player(player_info)
+  end    
+  when "3"
+
+    puts "\n thanks for playing RUBY RPG"
+    break
+    else
+      puts " invalid choice,please try again"
+    end
+  end
 
 
 
