@@ -37,7 +37,7 @@ end
 
 
 class Player
-  attr_reader :name, :id, :character_class, :attack, :defence, :health, :xp, 
+  attr_reader :name, :id, :character_class, :attack, :defence, :health, :xp, :level
 
   def initialize(name, character_class, health, attack, defence,
     id: SecureRandom.uuid, level: 1, xp: 0)
