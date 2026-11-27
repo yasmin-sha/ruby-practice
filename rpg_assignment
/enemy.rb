@@ -25,6 +25,10 @@ class Enemy
   end
 
   def display_info
-    puts "Name: #{@name} | Level: #{@level} | Health: #{@health} | Attack: #{@attack} | Defence: #{@defence}"
+    puts "Name: #{@name}"
+    puts "Level: #{@level}"
+    puts "Health: #{@health}"
+    puts "Attack: #{@attack} " 
+    puts " Defence: #{@defence}"
   end
 end
