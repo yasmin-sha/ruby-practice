@@ -1,0 +1,56 @@
+# frozen_string_literal: true
+
+require 'securerandom'
+
+class Player
+  attr_reader :name, :id, :character_class, :attack, :health, :xp, :level, :defence
+
+  def initialize(name, character_class, health, attack, defence, id: SecureRandom.uuid, level: 1, xp: 0)
+    @name = name
+    @id = id
+    @character_class = character_class
+    @health = health
+    @attack = attack
+    @defence = defence
+    @level = level
+    @xp = xp
+  end
+
+  def alive?
+    @health.positive?
+  end
+
+  def take_damage(damage)
+    @health = [@health - damage, 0].max
+  end
+
+  def gain_xp(amount)
+    return unless amount.positive?
+
+    @xp += amount
+    puts "#{@name} earned #{@xp}"
+    level_up while @xp >= level * 20
+  end
+
+  def level_up
+    @xp -= @level * 100
+    @level += 1
+    puts "level up, new level: #{@level}"
+  end
+
+  def special_attack
+    @attack
+  end
+
+  def display_info
+    puts "\n player information"
+    puts "Name: #{@name}"
+    puts "ID: #{id}"
+    puts "character_class: #{@character_class}"
+    puts "level: #{level}"
+    puts "xp: #{@xp}"
+    puts "Health: #{@health}"
+    puts "Attack: #{@attack}"
+    puts "Defence: #{@defence}"
+  end
+end

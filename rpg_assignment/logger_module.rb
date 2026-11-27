@@ -1,0 +1,9 @@
+# frozen_string_literal: true
+
+module LoggerModule
+  def log_event(message)
+    File.open('battle_log.txt', 'a') do |file|
+      file.puts "#{Time.now} - #{message}"
+    end
+  end
+end

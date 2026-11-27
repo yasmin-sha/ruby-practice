@@ -1,0 +1,18 @@
+# frozen_string_literal: true
+
+require_relative '..\enemy'
+
+class Troll < Enemy
+  def initialize
+    super('Troll', 2, 80, 20, 10)
+  end
+
+  def crushing_attack
+    puts 'Troll uses crushing attack'
+    @attack
+  end
+
+  def special_attack
+    crushing_attack
+  end
+end

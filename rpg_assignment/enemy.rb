@@ -1,0 +1,30 @@
+# frozen_string_literal: true
+
+class Enemy
+  attr_reader :name, :level, :health, :attack, :defence
+
+  def initialize(name, level, health, attack, defence)
+    @name = name
+    @level = level
+    @health = health
+    @attack = attack
+    @defence = defence
+  end
+
+  def alive?
+    @health.positive?
+  end
+
+  def take_damage(damage)
+    @health = [@health - damage, 0].max
+    puts "remaining health: #{@health}"
+  end
+
+  def special_attack
+    @attack
+  end
+
+  def display_info
+    puts "Name: #{@name} | Level: #{@level} | Health: #{@health} | Attack: #{@attack} | Defence: #{@defence}"
+  end
+end

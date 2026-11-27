@@ -1,0 +1,59 @@
+# frozen_string_literal: true
+
+require 'yaml'
+require_relative 'character'
+
+module SaveFile
+  FILE_NAME = 'player_data.yml'
+
+  def self.save_player(player)
+    player_data = {
+      'name' => player.name,
+      'id' => player.id,
+      'character_class' => player.character_class,
+      'level' => player.level,
+      'xp' => player.xp,
+      'health' => player.health,
+      'attack' => player.attack,
+      'defence' => player.defence
+    }
+
+    File.write(FILE_NAME, YAML.dump(player_data))
+
+    puts 'game saved successfully'
+  rescue SystemCallError => e
+    puts "could not save game: #{e.message}"
+  end
+
+  def self.load_player
+    unless File.exist?(FILE_NAME)
+      puts 'No saved game found'
+      return nil
+    end
+    loaded_data = YAML.safe_load(File.read(FILE_NAME))
+
+    unless loaded_data.is_a?(Hash)
+      puts 'saved game file is corrupted.'
+      return nil
+    end
+
+    player = Player.new(
+      loaded_data['name'],
+      loaded_data['character_class'],
+      loaded_data['health'],
+      loaded_data['attack'],
+      loaded_data['defence'],
+      id: loaded_data['id'],
+      level: loaded_data['level'],
+      xp: loaded_data['xp']
+    )
+
+    puts 'game loaded successfully'
+    player.display_info
+
+    player
+  rescue SystemCallError => e
+    puts "could not load game: #{e.message}"
+    nil
+  end
+end

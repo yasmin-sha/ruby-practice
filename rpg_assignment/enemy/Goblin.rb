@@ -1,0 +1,18 @@
+# frozen_string_literal: true
+
+require_relative '..\enemy'
+
+class Goblin < Enemy
+  def initialize
+    super('Goblin', 1, 40, 10, 5)
+  end
+
+  def poison_attack
+    puts 'Goblin uses poison attack'
+    @attack
+  end
+
+  def special_attack
+    poison_attack
+  end
+end

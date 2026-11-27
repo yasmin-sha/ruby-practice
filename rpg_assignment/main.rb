@@ -1,0 +1,121 @@
+# frozen_string_literal: true
+
+require_relative 'character'
+require_relative 'enemy'
+require_relative 'combat_engine'
+require_relative 'save_file'
+
+require_relative 'character/Mage'
+require_relative 'character/Rogue'
+require_relative 'character/Warrior'
+
+require_relative 'enemy/Dragon'
+require_relative 'enemy/Goblin'
+require_relative 'enemy/Troll'
+
+module Formatter
+  def self.format_title(title)
+    cleaned = title.to_s.strip.gsub(/\s+/, ' ').upcase
+    header = '-' * cleaned.length
+
+    "#{header}\n #{cleaned}\n  #{header}"
+  end
+end
+
+class Game
+  def start
+    puts Formatter.format_title('Ruby rpg game ')
+
+    loop do
+      show_main_menu
+
+      choice = gets.chomp.strip
+
+      case choice
+      when '1'
+        new_game
+      when '2'
+        load_game
+      when '3'
+        puts 'Thanks for playing Ruby RPG Game'
+        break
+      else
+        puts 'invalid choice, try again'
+      end
+    end
+  end
+
+  private
+
+  def show_main_menu
+    puts "\n1. New Game."
+    puts "\n2. Load Game."
+    puts "\n3. Exit."
+
+    print 'Enter your choice: '
+  end
+
+  def create_player
+    print "\n Enter player name: "
+    name = gets.chomp.strip
+
+    if name.empty?
+      puts 'Name cannot be empty'
+      return nil
+    end
+
+    classes = Player.subclasses.sort_by(&:name)
+    puts "\n choose character class: "
+    classes.each_with_index do |character, index|
+      puts "#{index + 1}. #{character.name}"
+    end
+
+    print 'Enter your choice: '
+    choice = gets.chomp.strip.to_i
+
+    selected_class = classes[choice - 1]
+
+    unless selected_class
+      puts 'invalid character choice'
+      return nil
+    end
+
+    player = selected_class.new(name)
+    puts "\n character created successfully"
+    player.display_info
+    player
+  end
+
+  def create_random_enemy
+    enemies = [Goblin.new, Troll.new, Dragon.new]
+
+    enemies.sample
+  end
+
+  def new_game
+    player = create_player
+
+    return unless player
+
+    play_game(player)
+  end
+
+  def load_game
+    player = SaveFile.load_player
+    return unless player
+
+    play_game(player)
+  end
+
+  def play_game(player)
+    enemy = create_random_enemy
+
+    puts "\n A valid #{enemy.name} appear"
+
+    enemy.display_info
+    CombatEngine.new(player, enemy).start_battle
+    SaveFile.save_player(player)
+  end
+end
+
+Game.new.start

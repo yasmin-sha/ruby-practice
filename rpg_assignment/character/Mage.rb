@@ -1,0 +1,18 @@
+# frozen_string_literal: true
+
+require_relative '../character'
+
+class Mage < Player
+  def initialize(name)
+    super(name, 'Mage', 100, 30, 8)
+  end
+
+  def fireball
+    puts "#{@name} casts fireball"
+    @attack
+  end
+
+  def special_attack
+    fireball
+  end
+end

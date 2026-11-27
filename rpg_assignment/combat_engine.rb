@@ -1,0 +1,110 @@
+# frozen_string_literal: true
+
+require_relative 'logger_module'
+
+class CombatEngine
+  include LoggerModule
+
+  def initialize(player, enemy)
+    @player = player
+    @enemy = enemy
+    @defending = false
+  end
+
+  def player_attack
+    log_event('player attacked the enemy')
+
+    damage = [@player.special_attack - @enemy.defence, 0].max
+    puts "player deals #{damage} damage"
+
+    @enemy.take_damage(damage)
+  end
+
+  def enemy_attack
+    log_event('enemy attacked the player')
+
+    damage = [@enemy.special_attack - @player.defence, 0].max
+    if @defending
+      damage /= 2
+      puts "player defended, reducd damage:#{damage}"
+    else
+      puts "enemy deals #{damage} damage"
+    end
+
+    @defending = false
+    @player.take_damage(damage)
+  end
+
+  def defend
+    log_event('player defended')
+
+    @defending = true
+    puts 'player is defending'
+  end
+
+  def run
+    log_event('player tried to escape')
+    if rand(1..2) == 1
+      puts 'you escaped'
+      true
+    else
+      puts 'escaped failed: enemy attack'
+      false
+    end
+  end
+
+  def start_battle
+    log_event('battle started')
+
+    loop do
+      break unless @player.alive? && @enemy.alive?
+
+      show_battle_menu
+
+      choice = gets.chomp.strip
+
+      case choice
+      when '1'
+        player_attack
+      when '2'
+        defend
+      when '3'
+        break if run
+      else
+        puts 'invalid choice, try again'
+        next
+      end
+
+      break unless @enemy.alive?
+
+      enemy_attack
+
+      next if @player.alive?
+
+      log_event('player was defeated')
+      puts 'you are defeated'
+
+      break
+    end
+
+    reward_player if !@enemy.alive? && @player.alive?
+  end
+
+  private
+
+  def show_battle_menu
+    puts "\n choose your action"
+    puts '1. attack'
+    puts '2. defend'
+    puts '3. run'
+
+    print 'Enter your choice: '
+  end
+
+  def reward_player
+    reward = @enemy.level * 20
+
+    puts 'congratulation, you defeated the enemy'
+    @player.gain_xp(reward)
+  end
+end

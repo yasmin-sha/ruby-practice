@@ -1,0 +1,18 @@
+# frozen_string_literal: true
+
+require_relative '../character'
+
+class Rogue < Player
+  def initialize(name)
+    super(name, 'Rogue', 120, 25, 10)
+  end
+
+  def critical_attack
+    puts "#{@name} performs critical attack"
+    @attack
+  end
+
+  def special_attack
+    critical_attack
+  end
+end
